@@ -2,6 +2,9 @@ import System.Random
 import Control.Monad
 import System.IO
 
+numIterations = 1000
+gradientStep = 0.01
+datasize = 784
 
 dot::(Num a) => [a]->[a]->a
 dot [] [] = 0
@@ -26,24 +29,48 @@ gradientError weightvec datavec label =
 									if label then map ((x - 1.0) * ) datavec
 										else map (x * ) datavec
 
-getRandomVec :: Int -> IO [Float]
+addListOfLists::[[Float]]->[Float]
+addListOfLists [[]] = take datasize (repeat 0.0)
+addListOfLists (h:t) = zipWith (+) h (addListOfLists t)
+
+
+totalGradientError::Int->[[Float]]->[Float]->[Float]
+totalGradientError dataArray currentWeightVec = addListOfLists(map (\dataVec->gradientError currentWeightVec dataVec False) dataArray)
+
+
+getRandomVec::Int -> IO [Float]
 getRandomVec size = replicateM size (randomIO :: IO Float) 
 
 
-wordsWhen     :: (Char -> Bool) -> String -> [String]
+wordsWhen::(Char -> Bool) -> String -> [String]
 wordsWhen p s =  case dropWhile p s of
                       "" -> []
                       s' -> w : wordsWhen p s''
                             where (w, s'') = break p s'
 
+char2float :: Char -> Float
+char2float n = fromInteger (read [n])
+
+--Not happy about these two functions, need to make them more clean..
+-- ******************************************************* 
+convertLineToVec :: String -> [Float]
+convertLineToVec s = map (\c -> (char2float (c !! 0))) (wordsWhen (','==) s)
+
+readData inh dataArray = do
+	ineof <- hIsEOF inh
+	if ineof then return dataArray
+		else do 
+			inpStr <- hGetLine inh
+			readData inh (dataArray ++ [convertLineToVec inpStr])
+
+-- ********************************************************
+
+{-iterate i weightVec dataArray = if i==0 then weightVec 
+									else iterate i-1 weightVec + map(gradientStep *-}
 
 
 
-main = do 
-	inh <- openFile "test.txt" ReadMode
-	inpStr <- hGetLine inh
-	vec <- getRandomVec 10
-	putStrLn (show vec ++ "    " ++ show inpStr)
+
 
 		
 
