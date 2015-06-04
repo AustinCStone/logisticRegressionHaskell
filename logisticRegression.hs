@@ -2,12 +2,7 @@ import System.Random
 import Control.Monad
 import System.IO
 
-data Bs a = Bullshit a deriving(Show)
 
-
-monadbreak (Bullshit val) = val
-
--- | ∑i(y(i)log(hθ(x(i)))+(1−y(i))log(1−hθ(x(i)))).
 dot::(Num a) => [a]->[a]->a
 dot [] [] = 0
 dot (first:rest) (first2:rest2) = (first * first2) + (dot rest rest2)
