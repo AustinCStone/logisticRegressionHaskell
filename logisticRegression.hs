@@ -3,7 +3,7 @@ import Control.Monad
 import System.IO
 import Debug.Trace
 
-numIterations = 100
+numIterations = 10000
 alpha = 0.01
 datasize = 784
 
@@ -88,9 +88,9 @@ readData inh trainData label = do
 
 converge i weightvec trainData | trace ("Iteration " ++ show i ++ " Total Error: " ++ show (totalError weightvec trainData))  False = undefined
 converge i weightvec trainData = if i==0 then weightvec 
-									else converge (i-1) (vadd 
+									else converge (i-1) (normalize  (vadd 
 										weightvec
-										(sm alpha (vadd (totalGradientError trainData weightvec) weightvec)))
+										(sm alpha (vadd (totalGradientError trainData weightvec) weightvec))) )
 										trainData
 
 -- | interleave two lists
